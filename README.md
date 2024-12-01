@@ -4,9 +4,9 @@ Flutter uart terminal app based on xterm package
 
 ## Getting Started
 
-This app talk to device via uart interface on PC.
-App is written based on xterm package and get help from "www.perplexity.ai".
-Current code is one code base and will add screens and features to use for my own purpose.
+This app talk to device via uart interface on PC.</br>
+App is written based on xterm package and get help from "www.perplexity.ai".</br>
+Current code is one code base and will add screens and features to use for my own purpose.</br>
 
 ## Features
 
