@@ -1,8 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:xterm/xterm.dart';
-import 'package:flutter_libserialport/flutter_libserialport.dart';
+import 'package:flutter_xterm_uart_terminal/menu.dart';
+import 'package:flutter_xterm_uart_terminal/serial_terminal.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,62 +12,38 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: SerialTerminal(),
+      debugShowCheckedModeBanner: false,
+      home: MyHomePage(
+        title: 'Flutter Xterm Uart Terminal',
+      ),
+      // home: SerialTerminal(),
     );
   }
 }
 
-class SerialTerminal extends StatefulWidget {
-  const SerialTerminal({super.key});
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
 
   @override
-  // ignore: library_private_types_in_public_api
-  _SerialTerminalState createState() => _SerialTerminalState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _SerialTerminalState extends State<SerialTerminal> {
-  late Terminal terminal;
-  SerialPort? port;
-
-  @override
-  void initState() {
-    super.initState();
-    terminal = Terminal();
-    _initSerialPort();
-  }
-
-  void _initSerialPort() {
-    final availablePorts = SerialPort.availablePorts;
-    if (availablePorts.isNotEmpty) {
-      port = SerialPort(availablePorts.first);
-      port!.openReadWrite();
-
-      terminal.onOutput = (data) {
-        port!.write(Uint8List.fromList(data.codeUnits));
-      };
-
-      _readSerialData();
-    }
-  }
-
-  void _readSerialData() {
-    final reader = SerialPortReader(port!);
-    reader.stream.listen((data) {
-      terminal.write(String.fromCharCodes(data));
-    });
-  }
-
+class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Xterm Uart Terminal')),
-      body: TerminalView(terminal),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: const Column(
+        children: [
+          ComScreen(),
+          SerialTerminal(),
+        ],
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    port?.close();
-    super.dispose();
   }
 }
