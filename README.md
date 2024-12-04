@@ -17,8 +17,8 @@ Current code is one code base and will add screens and features to use for my ow
 ## TODOs
 
 - Separate screens
-  - COM control screen
-  - Log file handler
+  - ~~COM control screen~~
+- Log file handler
 
 ## History
 
@@ -26,4 +26,7 @@ Current code is one code base and will add screens and features to use for my ow
   - First commit
   - it works normally like as terminal app
   - uart tx/rx on xterm is working
-  
+- 2024.12.04
+  - Separate screens
+  - Bottom navigation bar added to change mode from settings/bluetooth/wifi
+  - Serial terminal screen sperated
