@@ -2,10 +2,20 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
-MyUtils utils = MyUtils();
+MyUtils utils = MyUtils(Level.all);
 
 class MyUtils {
+  var logger = Logger(
+    filter: null, // Use the default LogFilter (-> only log in debug mode)
+    printer: PrettyPrinter(), // Use the PrettyPrinter to format and print log
+    output: null, // Use the default LogOutput (-> send everything to console)
+  );
+
+  MyUtils(Level lvl) {
+    Logger.level = lvl;
+  }
   void showSnackbar(BuildContext context, String msg) {
     final snackBar = SnackBar(
       duration: const Duration(seconds: 1),
@@ -94,5 +104,33 @@ class MyUtils {
         height: height,
         indent: indent,
         endIndent: endIndent);
+  }
+
+  d(String str) {
+    logger.d(str);
+  }
+
+  t(String str) {
+    logger.t(str);
+  }
+
+  i(String str) {
+    logger.i(str);
+  }
+
+  w(String str) {
+    logger.w(str);
+  }
+
+  e(String str, String errMsg) {
+    logger.e(str, error: errMsg);
+  }
+
+  f(String str, String errMsg, StackTrace? stkTrace) {
+    logger.f(str, error: errMsg, stackTrace: stkTrace);
+  }
+
+  logLevel(Level lvl) {
+    Logger.level = lvl;
   }
 }

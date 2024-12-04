@@ -39,6 +39,8 @@ dependencies:
   flutter_libserialport: ^0.4.0
   cp949_codec: ^1.0.2
   path_provider: ^2.1.4
+  font_awesome_flutter: ^10.8.0
+  logger: ^2.5.0
 
 dev_dependencies:
   flutter_test:

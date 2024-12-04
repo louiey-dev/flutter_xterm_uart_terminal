@@ -1,9 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_xterm_uart_terminal/menu.dart';
+import 'package:flutter_xterm_uart_terminal/screens/com_port_screen.dart';
 import 'package:xterm/xterm.dart';
-import 'package:flutter_libserialport/flutter_libserialport.dart';
 
 late Terminal terminal;
 
@@ -46,7 +43,7 @@ class _SerialTerminalState extends State<SerialTerminal> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: TerminalView(terminal));
+    return Expanded(flex: 1, child: TerminalView(terminal));
   }
   // @override
   // Widget build(BuildContext context) {

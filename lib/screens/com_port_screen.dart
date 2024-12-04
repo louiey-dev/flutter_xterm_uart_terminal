@@ -1,12 +1,27 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
-import 'package:flutter_xterm_uart_terminal/serial_terminal.dart';
+import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 
 List<SerialPort> portList = [];
 SerialPort? mSp;
+
+bool serialSend(String cmd) {
+  try {
+    if (mSp == null) {
+      utils.e("mSp is null", "com error");
+      return false;
+    }
+    mSp!.write(utf8.encode(cmd));
+  } catch (ex) {
+    utils.log(ex.toString());
+    return false;
+  }
+  return true;
+}
 
 class ComScreen extends StatefulWidget {
   const ComScreen({super.key});
@@ -30,10 +45,23 @@ class _ComScreenState extends State<ComScreen> {
             ? 'Close'
             : 'Open';
 
-    return Row(
-      children: [
-        _comPort(),
-      ],
+    return Expanded(
+      flex: 2,
+      child: Row(
+        children: [
+          _comPort(),
+          const SizedBox(
+            width: 20,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              String cmd = "ls -al\n";
+              serialSend(cmd);
+            },
+            child: const Text("Test"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -67,19 +95,23 @@ class _ComScreenState extends State<ComScreen> {
   }
 
   _comConfig() {
-    SerialPortConfig config = mSp!.config;
-    // config.baudRate = 115200;
-    config.baudRate = menuBaudrate;
-    config.parity = 0;
-    config.bits = 8;
-    config.cts = 0;
-    config.rts = 0;
-    config.stopBits = 1;
-    config.xonXoff = 0;
-    mSp!.config = config;
+    try {
+      SerialPortConfig config = mSp!.config;
+      // config.baudRate = 115200;
+      config.baudRate = menuBaudrate;
+      config.parity = 0;
+      config.bits = 8;
+      config.cts = 0;
+      config.rts = 0;
+      config.stopBits = 1;
+      config.xonXoff = 0;
+      mSp!.config = config;
 
-    utils.log("baudrate : $menuBaudrate");
-    // inputController.text = configCmd;
+      utils.log("baudrate : $menuBaudrate");
+      // inputController.text = configCmd;
+    } catch (ex) {
+      utils.log(ex.toString());
+    }
   }
 
   _comOpen() {
@@ -106,7 +138,7 @@ class _ComScreenState extends State<ComScreen> {
         if (mSp!.isOpen) {
           utils.log('${mSp!.name} opened!');
         } else {
-          utils.log("mSP open error\n");
+          utils.e("mSP open error\n", "com open error");
           return;
         }
 
@@ -116,7 +148,11 @@ class _ComScreenState extends State<ComScreen> {
 
         _readSerialData();
       } else {
-        utils.log("COM port open error\n");
+        utils.e("COM port open error\n", "com open error");
+        // if (mSp!.isOpen) {
+        //   mSp!.close();
+        // }
+        // mSp!.dispose();
       }
     }
   }
@@ -136,6 +172,7 @@ class _ComScreenState extends State<ComScreen> {
           children: [
             const SizedBox(width: 20),
             DropdownButton(
+              menuMaxHeight: 0.5,
               // focusColor: Colors.white,
               value: mSp,
               items: portList.map((item) {
