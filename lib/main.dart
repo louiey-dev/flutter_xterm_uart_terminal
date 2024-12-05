@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_xterm_uart_terminal/config.dart';
 import 'package:flutter_xterm_uart_terminal/screens/bluetooth_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/settings_screen.dart';
@@ -52,14 +53,18 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: [
           const SerialTerminal(),
-          IndexedStack(
-            index: _selectedIndex,
-            children: const [
-              // Add screen here
-              SettingScreen(),
-              WiFiScreen(),
-              BluetoothScreen(),
-            ],
+          SizedBox(
+            height: 100,
+            child: IndexedStack(
+              index: _selectedIndex,
+              children: const [
+                // myHeight(10),
+                // Add screen here
+                SettingScreen(),
+                WiFiScreen(),
+                BluetoothScreen(),
+              ],
+            ),
           ),
         ],
       ),

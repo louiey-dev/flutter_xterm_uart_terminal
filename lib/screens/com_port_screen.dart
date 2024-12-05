@@ -12,12 +12,12 @@ SerialPort? mSp;
 bool serialSend(String cmd) {
   try {
     if (mSp == null) {
-      utils.e("mSp is null", "com error");
+      utils.e("mSp is null");
       return false;
     }
     mSp!.write(utf8.encode(cmd));
   } catch (ex) {
-    utils.log(ex.toString());
+    utils.e(ex.toString());
     return false;
   }
   return true;
@@ -37,6 +37,9 @@ class _ComScreenState extends State<ComScreen> {
 
   SerialPortReader? reader;
 
+  final _cmdList = ['pwd', 'ls -al', 'tail -F /var/log/legacy-log'];
+  var _selectedValue = 'pwd';
+
   @override
   Widget build(BuildContext context) {
     openButtonText = mSp == null
@@ -45,23 +48,38 @@ class _ComScreenState extends State<ComScreen> {
             ? 'Close'
             : 'Open';
 
-    return Expanded(
-      flex: 2,
-      child: Row(
-        children: [
-          _comPort(),
-          const SizedBox(
-            width: 20,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String cmd = "ls -al\n";
-              serialSend(cmd);
-            },
-            child: const Text("Test"),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            _comPort(),
+            const SizedBox(width: 20),
+            DropdownButton(
+              value: _selectedValue,
+              items: _cmdList.map(
+                (value) {
+                  return DropdownMenuItem(
+                    value: value,
+                    child: Text(value),
+                  );
+                },
+              ).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedValue = value!;
+                });
+              },
+            ),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () {
+                serialSend("$_selectedValue\n");
+              },
+              child: const Text("Send"),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -70,6 +88,11 @@ class _ComScreenState extends State<ComScreen> {
       var i = 0;
 
       portList.clear();
+
+      if (SerialPort.availablePorts.isEmpty) {
+        utils.e("There is no available ports");
+        return;
+      }
 
       for (final name in SerialPort.availablePorts) {
         final sp = SerialPort(name);
@@ -138,7 +161,7 @@ class _ComScreenState extends State<ComScreen> {
         if (mSp!.isOpen) {
           utils.log('${mSp!.name} opened!');
         } else {
-          utils.e("mSP open error\n", "com open error");
+          utils.e("mSP open error\n");
           return;
         }
 
@@ -148,7 +171,7 @@ class _ComScreenState extends State<ComScreen> {
 
         _readSerialData();
       } else {
-        utils.e("COM port open error\n", "com open error");
+        utils.e("COM port open error\n");
         // if (mSp!.isOpen) {
         //   mSp!.close();
         // }
@@ -160,7 +183,8 @@ class _ComScreenState extends State<ComScreen> {
   void _readSerialData() {
     reader = SerialPortReader(mSp!);
     reader!.stream.listen((data) {
-      terminal.write(String.fromCharCodes(data));
+      String str = String.fromCharCodes(data);
+      terminal.write(str);
     });
   }
 
@@ -173,12 +197,10 @@ class _ComScreenState extends State<ComScreen> {
             const SizedBox(width: 20),
             DropdownButton(
               menuMaxHeight: 0.5,
-              // focusColor: Colors.white,
               value: mSp,
               items: portList.map((item) {
                 return DropdownMenuItem(
                     value: item, child: Text("${item.name}"));
-                // "${item.name}: ${cp949.decodeString(item.description ?? '')}"));
               }).toList(),
               onChanged: (e) {
                 setState(() {

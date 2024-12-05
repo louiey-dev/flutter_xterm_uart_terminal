@@ -29,4 +29,6 @@ Current code is one code base and will add screens and features to use for my ow
 - 2024.12.04
   - Separate screens
   - Bottom navigation bar added to change mode from settings/bluetooth/wifi
-  - Serial terminal screen sperated
+  - Serial terminal screen separated
+- 2024.12.05
+  - Added some buttons to control via uart

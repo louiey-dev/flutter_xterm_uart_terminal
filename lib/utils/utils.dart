@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 
 MyUtils utils = MyUtils(Level.all);
+// late MyUtils utils;
 
 class MyUtils {
   var logger = Logger(
@@ -13,9 +17,75 @@ class MyUtils {
     output: null, // Use the default LogOutput (-> send everything to console)
   );
 
+  late File logFile;
+  String logBuffer = '';
+
   MyUtils(Level lvl) {
     Logger.level = lvl;
+
+    // _logFileInit();
   }
+
+  // log file handler
+  int logFileMaxSize = 1000;
+  Future<void> logFileOpen() async {
+    try {
+      // if (logFile == null) {
+      //   logger.e("log file is null");
+      //   return;
+      // }
+
+      final directory = await getApplicationDocumentsDirectory();
+      String formatDate =
+          DateFormat('yyyy_MM_dd-HH_mm_ss').format(DateTime.now());
+      logFile = File('${directory.path}\\$formatDate.log');
+      if (!await logFile.exists()) {
+        await logFile.create();
+        log("log file created\n");
+      }
+    } catch (ex) {
+      logger.e(ex);
+      return;
+    }
+  }
+
+  Future<void> logFileClose() async {
+    try {
+      _logSave();
+      if (await logFile.exists()) {
+        // await logFile.delete();
+        log("log file closed\n");
+      }
+    } catch (ex) {
+      logger.e(ex);
+      return;
+    }
+  }
+
+  void logFileWrite(String text) {
+    logBuffer += text;
+    if (logBuffer.length > logFileMaxSize) {
+      // 버퍼가 일정 크기 이상이면 파일에 저장
+      _logSave();
+    }
+  }
+
+  // void logFileWriteString(String text) async {
+  //   logFile.writeAsStringSync(text, mode: FileMode.append, flush: true);
+  // }
+  Future<void> logFileWriteString(String text) async {
+    await logFile.writeAsString(text, mode: FileMode.append, flush: true);
+    // await logFile.writeAsString(text);
+  }
+
+  Future<void> _logSave() async {
+    if (logBuffer.isNotEmpty) {
+      await logFile.writeAsString(logBuffer, mode: FileMode.append);
+      logBuffer = '';
+    }
+  }
+  ///////////////////////////////////////////////////////
+
   void showSnackbar(BuildContext context, String msg) {
     final snackBar = SnackBar(
       duration: const Duration(seconds: 1),
@@ -122,8 +192,12 @@ class MyUtils {
     logger.w(str);
   }
 
-  e(String str, String errMsg) {
-    logger.e(str, error: errMsg);
+  err(String str, String errMsg) {
+    logger.e(str, time: DateTime.now(), error: errMsg);
+  }
+
+  e(String str) {
+    logger.e(str, time: DateTime.now());
   }
 
   f(String str, String errMsg, StackTrace? stkTrace) {
