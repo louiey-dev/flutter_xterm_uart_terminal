@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -32,15 +34,62 @@ Future<void> logFileWrite(String log) async {
 
 File? logFile;
 
+IOSink? logSink;
+
+StringBuffer logBuffer = StringBuffer(); // To store terminal output. // louiey
+
+Timer? flushTimer; // Periodic flush timer
+
+const Duration flushInterval = Duration(milliseconds: 500); // Flush every 500ms
+
+const int maxBufferSize = 1024; // Flush when buffer reaches 1KB
+
 Future<String> get localPath async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
 
 void logFileOpen(String logName) async {
-  final path = await localPath;
-  logFile = File('$path\\$logName');
-  utils.log(logFile.toString());
+  try {
+    final path = await localPath;
+    logFile = File('$path\\$logName');
+
+    if (logFile != null) {
+      logSink = logFile!.openWrite(mode: FileMode.append);
+      startFlushTimer();
+    } else {
+      utils.e("logFile is null");
+      return;
+    }
+
+    utils.log(logFile.toString());
+  } catch (e) {
+    utils.e(e.toString());
+  }
+}
+
+// Start a timer to periodically flush the buffer
+void startFlushTimer() {
+  utils.log("Log FlushTimer started : $flushInterval");
+  flushTimer = Timer.periodic(flushInterval, (timer) {
+    flushBuffer();
+  });
+}
+
+// Flush the buffer to disk asynchronously
+Future<void> flushBuffer() async {
+  if (logBuffer.isNotEmpty) {
+    logSink?.write(logBuffer.toString());
+    logBuffer.clear(); // Clear the buffer after writing
+    utils.log("log saved");
+  }
+}
+
+// Check if buffer exceeds size limit and flush if necessary
+void checkBufferAndFlush() {
+  if (logBuffer.length >= maxBufferSize) {
+    flushBuffer();
+  }
 }
 
 /*
@@ -50,6 +99,14 @@ Future<void> logFileWrite(String log) async {
   // utils.d(log);
 }
 */
-void logFileWrite(String log) {
-  logFile!.writeAsString(log, mode: FileMode.append, flush: true);
+void logFileWrite(String log) async {
+  try {
+    // await logFile!.writeAsString(log, mode: FileMode.append, flush: true);
+    await logFile!.writeAsString(logBuffer.toString(),
+        mode: FileMode.append, flush: true);
+    logBuffer.clear();
+    // utils.d(log);
+  } catch (e) {
+    utils.e(e.toString());
+  }
 }

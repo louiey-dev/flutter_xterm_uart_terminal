@@ -193,8 +193,6 @@ class _ComScreenState extends State<ComScreen> {
 
         terminal.onOutput = (data) {
           mSp!.write(Uint8List.fromList(data.codeUnits));
-          // utils.log("dbg - $data");
-          // logFileWrite(String.fromCharCodes(data.codeUnits));
         };
 
         _readSerialData();
@@ -209,12 +207,13 @@ class _ComScreenState extends State<ComScreen> {
   }
 
   void _readSerialData() {
-    reader = SerialPortReader(mSp!);
+    reader = SerialPortReader(mSp!, timeout: 1000);
     reader!.stream.listen((data) {
       String str = String.fromCharCodes(data);
       terminal.write(str);
-      logFileWrite(str);
-      utils.log(str);
+      logBuffer.write(str);
+      // logFileWrite(str);
+      // utils.log("rd : ${data.length}");
     });
   }
 

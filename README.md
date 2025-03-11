@@ -18,7 +18,9 @@ Current code is one code base and will add screens and features to use for my ow
 
 - Separate screens
   - ~~COM control screen~~
-- Log file handler
+- ~~Log file handler~~
+  - Optimized with timer handler
+  - periodically check log buffer and save log file
 
 ## History
 
@@ -32,3 +34,7 @@ Current code is one code base and will add screens and features to use for my ow
   - Serial terminal screen separated
 - 2024.12.05
   - Added some buttons to control via uart
+- 2025.03.11
+  - Log feature added
+  - Use timer to log to file and saved resources
+  - Log file handler added
