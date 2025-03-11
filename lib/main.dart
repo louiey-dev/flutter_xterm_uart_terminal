@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_xterm_uart_terminal/config.dart';
+import 'package:flutter_xterm_uart_terminal/platform_menu.dart';
 import 'package:flutter_xterm_uart_terminal/screens/bluetooth_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/settings_screen.dart';
@@ -17,8 +17,10 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       color: Colors.blue,
       debugShowCheckedModeBanner: false,
-      home: MyHomePage(
-        title: 'Flutter Xterm Uart Terminal',
+      home: AppPlatformMenu(
+        child: MyHomePage(
+          title: 'Flutter Xterm Uart Terminal',
+        ),
       ),
     );
   }
@@ -48,7 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         backgroundColor: Colors.lightBlue,
-        title: Text(widget.title),
+        // title: Text(widget.title),
+        toolbarHeight: 0, // wanted mot to display title bar, louiey 2025.03.11
       ),
       body: Column(
         children: [

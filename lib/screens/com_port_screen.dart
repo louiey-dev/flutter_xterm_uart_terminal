@@ -4,10 +4,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
+import 'package:flutter_xterm_uart_terminal/utils/log_file.dart';
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 
 List<SerialPort> portList = [];
 SerialPort? mSp;
+
+final TextEditingController logFileNameController = TextEditingController();
 
 bool serialSend(String cmd) {
   try {
@@ -39,6 +42,7 @@ class _ComScreenState extends State<ComScreen> {
 
   final _cmdList = ['pwd', 'ls -al', 'tail -F /var/log/legacy-log'];
   var _selectedValue = 'pwd';
+  final _logFileList = ['DateTime', ''];
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +81,26 @@ class _ComScreenState extends State<ComScreen> {
               },
               child: const Text("Send"),
             ),
+          ],
+        ),
+        const SizedBox(height: 1),
+        Row(
+          children: [
+            const SizedBox(width: 20),
+            // const Text("Log file input = "),
+            // const SizedBox(width: 20),
+            Expanded(
+              child: TextField(
+                controller: logFileNameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'input log file name',
+                  labelText: 'DateTime',
+                  prefixIcon: Icon(Icons.save_rounded),
+                ),
+              ),
+            ),
+            const SizedBox(width: 600)
           ],
         ),
       ],
@@ -165,8 +189,12 @@ class _ComScreenState extends State<ComScreen> {
           return;
         }
 
+        logFileOpen("term_log.log");
+
         terminal.onOutput = (data) {
           mSp!.write(Uint8List.fromList(data.codeUnits));
+          // utils.log("dbg - $data");
+          // logFileWrite(String.fromCharCodes(data.codeUnits));
         };
 
         _readSerialData();
@@ -185,6 +213,8 @@ class _ComScreenState extends State<ComScreen> {
     reader!.stream.listen((data) {
       String str = String.fromCharCodes(data);
       terminal.write(str);
+      logFileWrite(str);
+      utils.log(str);
     });
   }
 
