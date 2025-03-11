@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 /*
@@ -52,7 +53,11 @@ Future<String> get localPath async {
 void logFileOpen(String logName) async {
   try {
     final path = await localPath;
-    logFile = File('$path\\$logName');
+    // Get current date and time
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyyMMdd_HHmmss').format(now);
+
+    logFile = File('$path\\${formattedDate}_$logName');
 
     if (logFile != null) {
       logSink = logFile!.openWrite(mode: FileMode.append);

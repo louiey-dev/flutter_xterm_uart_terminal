@@ -37,12 +37,13 @@ class _ComScreenState extends State<ComScreen> {
   int menuBaudrate = 115200;
   String openButtonText = 'N/A';
   List<int> baudRate = [3800, 9600, 115200, 1500000];
+  final _logFileName = "xterm.log";
 
   SerialPortReader? reader;
 
   final _cmdList = ['pwd', 'ls -al', 'tail -F /var/log/legacy-log'];
   var _selectedValue = 'pwd';
-  final _logFileList = ['DateTime', ''];
+  // final _logFileList = ['DateTime', ''];
 
   @override
   Widget build(BuildContext context) {
@@ -54,54 +55,62 @@ class _ComScreenState extends State<ComScreen> {
 
     return Column(
       children: [
-        Row(
-          children: [
-            _comPort(),
-            const SizedBox(width: 20),
-            DropdownButton(
-              value: _selectedValue,
-              items: _cmdList.map(
-                (value) {
-                  return DropdownMenuItem(
-                    value: value,
-                    child: Text(value),
-                  );
+        SizedBox(
+          width: double.infinity,
+          // height: double.infinity,
+          child: Row(
+            children: [
+              _comPort(),
+              const SizedBox(width: 20),
+              DropdownButton(
+                value: _selectedValue,
+                items: _cmdList.map(
+                  (value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(value),
+                    );
+                  },
+                ).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedValue = value!;
+                  });
                 },
-              ).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedValue = value!;
-                });
-              },
-            ),
-            const SizedBox(width: 20),
-            ElevatedButton(
-              onPressed: () {
-                serialSend("$_selectedValue\n");
-              },
-              child: const Text("Send"),
-            ),
-          ],
+              ),
+              const SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  serialSend("$_selectedValue\n");
+                },
+                child: const Text("Send"),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 1),
-        Row(
-          children: [
-            const SizedBox(width: 20),
-            // const Text("Log file input = "),
-            // const SizedBox(width: 20),
-            Expanded(
-              child: TextField(
-                controller: logFileNameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'input log file name',
-                  labelText: 'DateTime',
-                  prefixIcon: Icon(Icons.save_rounded),
+        SizedBox(
+          width: double.infinity,
+          // height: double.infinity,
+          child: Row(
+            children: [
+              // const SizedBox(width: 20),
+              // const Text("Log file input = "),
+              // const SizedBox(width: 20),
+              Expanded(
+                child: TextField(
+                  controller: logFileNameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'input log file name',
+                    labelText: 'DateTime',
+                    prefixIcon: Icon(Icons.save_rounded),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 600)
-          ],
+              const SizedBox(width: 600)
+            ],
+          ),
         ),
       ],
     );
@@ -189,7 +198,7 @@ class _ComScreenState extends State<ComScreen> {
           return;
         }
 
-        logFileOpen("term_log.log");
+        logFileOpen(_logFileName);
 
         terminal.onOutput = (data) {
           mSp!.write(Uint8List.fromList(data.codeUnits));

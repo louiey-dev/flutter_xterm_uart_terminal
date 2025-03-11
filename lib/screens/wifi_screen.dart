@@ -16,8 +16,8 @@ class WiFiScreen extends StatefulWidget {
 class _WiFiScreenState extends State<WiFiScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.lightGreen[300],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           Column(
@@ -41,6 +41,7 @@ class _WiFiScreenState extends State<WiFiScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
+                  myWidth(20),
                   serialBtn("find p2p",
                       "luna-send -f -n 1 luna://com.palm.wifi/p2p/getpeers '{\"subscribe\": true}'"),
                   myWidth(10),
