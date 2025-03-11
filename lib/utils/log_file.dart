@@ -4,34 +4,6 @@ import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-/*
-Future<File>? logFile;
-
-Future<String> get localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-  return directory.path;
-}
-
-Future<File> get localFile async {
-  final path = await localPath;
-  return File('$path/xterm_log.txt');
-}
-
-Future<void> writeLog(String log) async {
-  final file = await localFile;
-  await file.writeAsString('$log\n', mode: FileMode.append);
-}
-
-Future<File> logFileOpen(String logName) async {
-  final path = await localPath;
-  return File('$path/$logName');
-}
-
-Future<void> logFileWrite(String log) async {
-  final file = await localFile;
-  await file.writeAsString(log, mode: FileMode.append);
-}
-*/
 
 File? logFile;
 
