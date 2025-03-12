@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 import 'package:intl/intl.dart';
@@ -86,4 +87,10 @@ void logFileWrite(String log) async {
   } catch (e) {
     utils.e(e.toString());
   }
+}
+
+Uint8List convertStringToUint8List(String str) {
+  final List<int> codeUnits = str.codeUnits;
+  final Uint8List unit8List = Uint8List.fromList(codeUnits);
+  return unit8List;
 }

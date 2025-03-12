@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_xterm_uart_terminal/platform_menu.dart';
 import 'package:flutter_xterm_uart_terminal/screens/bluetooth_screen.dart';
+import 'package:flutter_xterm_uart_terminal/screens/chart_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/settings_screen.dart';
 import 'package:flutter_xterm_uart_terminal/screens/wifi_screen.dart';
@@ -66,16 +67,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 SettingScreen(),
                 WiFiScreen(),
                 BluetoothScreen(),
+                ChartScreen(),
               ],
             ),
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.link), label: "Setting"),
           BottomNavigationBarItem(icon: Icon(Icons.wifi), label: "WiFi"),
           BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: "BT"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined), label: "Chart"),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
