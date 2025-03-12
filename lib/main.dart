@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.link), label: "Setting"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Setting"),
           BottomNavigationBarItem(icon: Icon(Icons.wifi), label: "WiFi"),
           BottomNavigationBarItem(icon: Icon(Icons.bluetooth), label: "BT"),
           BottomNavigationBarItem(
