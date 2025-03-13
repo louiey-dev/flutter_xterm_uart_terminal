@@ -55,14 +55,13 @@ class _ComScreenState extends State<ComScreen> {
 
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          // height: double.infinity,
-          child: Row(
-            children: [
-              _comPort(),
-              const SizedBox(width: 20),
-              DropdownButton(
+        Row(
+          children: [
+            _comPort(),
+            const SizedBox(width: 20),
+            Expanded(
+              flex: 0,
+              child: DropdownButton(
                 value: _selectedValue,
                 items: _cmdList.map(
                   (value) {
@@ -78,39 +77,38 @@ class _ComScreenState extends State<ComScreen> {
                   });
                 },
               ),
-              const SizedBox(width: 20),
-              ElevatedButton(
+            ),
+            const SizedBox(width: 20),
+            Flexible(
+              child: ElevatedButton(
                 onPressed: () {
                   serialSend("$_selectedValue\n");
                 },
                 child: const Text("Send"),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         const SizedBox(height: 1),
-        SizedBox(
-          width: double.infinity,
-          // height: double.infinity,
-          child: Row(
-            children: [
-              // const SizedBox(width: 20),
-              // const Text("Log file input = "),
-              // const SizedBox(width: 20),
-              Expanded(
-                child: TextField(
-                  controller: logFileNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'input log file name',
-                    labelText: 'DateTime',
-                    prefixIcon: Icon(Icons.save_rounded),
-                  ),
+        Row(
+          children: [
+            // const SizedBox(width: 20),
+            // const Text("Log file input = "),
+            const SizedBox(width: 20),
+            Expanded(
+              flex: 1,
+              child: TextField(
+                controller: logFileNameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'input log file name',
+                  labelText: 'DateTime',
+                  prefixIcon: Icon(Icons.save_rounded),
                 ),
               ),
-              const SizedBox(width: 600)
-            ],
-          ),
+            ),
+            const SizedBox(width: 600)
+          ],
         ),
       ],
     );
@@ -221,8 +219,6 @@ class _ComScreenState extends State<ComScreen> {
       String str = String.fromCharCodes(data);
       terminal.write(str);
       logBuffer.write(str);
-      // logFileWrite(str);
-      // utils.log("rd : ${data.length}");
     });
   }
 

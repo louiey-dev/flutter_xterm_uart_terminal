@@ -21,10 +21,7 @@ class _SerialTerminalState extends State<SerialTerminal> {
 
     // Listen to terminal output, // louiey
     terminal.onOutput = (data) {
-      setState(() {
-        // logBuffer.write(data); // Append output to buffer
-        // logFileWrite("");
-      });
+      setState(() {});
     };
     // _initSerialPort();
   }

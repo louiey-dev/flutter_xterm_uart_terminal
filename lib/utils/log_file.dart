@@ -1,28 +1,27 @@
 import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 File? logFile;
-
 IOSink? logSink;
-
 StringBuffer logBuffer = StringBuffer(); // To store terminal output. // louiey
+const int flushLogTimerInterval = 500;
+Timer? flushLogTimer; // Periodic flush timer
 
-Timer? flushTimer; // Periodic flush timer
+const Duration flushLogInterval =
+    Duration(milliseconds: flushLogTimerInterval); // Flush every 500ms
 
-const Duration flushInterval = Duration(milliseconds: 500); // Flush every 500ms
+const int maxLogBufferSize = 1024; // Flush when buffer reaches 1KB
 
-const int maxBufferSize = 1024; // Flush when buffer reaches 1KB
-
+// Get the local path for the application's documents directory
 Future<String> get localPath async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
 
+// Open the log file
 void logFileOpen(String logName) async {
   try {
     final path = await localPath;
@@ -34,7 +33,7 @@ void logFileOpen(String logName) async {
 
     if (logFile != null) {
       logSink = logFile!.openWrite(mode: FileMode.append);
-      startFlushTimer();
+      startLogFlushTimer();
     } else {
       utils.e("logFile is null");
       return;
@@ -47,15 +46,26 @@ void logFileOpen(String logName) async {
 }
 
 // Start a timer to periodically flush the buffer
-void startFlushTimer() {
-  utils.log("Log FlushTimer started : $flushInterval");
-  flushTimer = Timer.periodic(flushInterval, (timer) {
-    flushBuffer();
+void startLogFlushTimer() {
+  utils.log("Log flushLogTimer started : $flushLogInterval");
+  flushLogTimer = Timer.periodic(flushLogInterval, (timer) {
+    flushLogBuffer();
   });
 }
 
+// Stop the timer when no longer needed
+void stopLogFlushTimer() {
+  if (flushLogTimer != null && flushLogTimer!.isActive) {
+    flushLogTimer!.cancel(); // Stop the timer
+    flushLogTimer = null; // release reference.
+    utils.log("Log flushLogTimer stopped : $flushLogInterval");
+  } else {
+    utils.log('Log flushLogTimer is not active!');
+  }
+}
+
 // Flush the buffer to disk asynchronously
-Future<void> flushBuffer() async {
+Future<void> flushLogBuffer() async {
   if (logBuffer.isNotEmpty) {
     logSink?.write(logBuffer.toString());
     logBuffer.clear(); // Clear the buffer after writing
@@ -65,32 +75,7 @@ Future<void> flushBuffer() async {
 
 // Check if buffer exceeds size limit and flush if necessary
 void checkBufferAndFlush() {
-  if (logBuffer.length >= maxBufferSize) {
-    flushBuffer();
+  if (logBuffer.length >= maxLogBufferSize) {
+    flushLogBuffer();
   }
-}
-
-/*
-Future<void> logFileWrite(String log) async {
-  // await logFile.writeAsString(log, mode: FileMode.append);
-  await logFile!.writeAsString(log, mode: FileMode.append, flush: true);
-  // utils.d(log);
-}
-*/
-void logFileWrite(String log) async {
-  try {
-    // await logFile!.writeAsString(log, mode: FileMode.append, flush: true);
-    await logFile!.writeAsString(logBuffer.toString(),
-        mode: FileMode.append, flush: true);
-    logBuffer.clear();
-    // utils.d(log);
-  } catch (e) {
-    utils.e(e.toString());
-  }
-}
-
-Uint8List convertStringToUint8List(String str) {
-  final List<int> codeUnits = str.codeUnits;
-  final Uint8List unit8List = Uint8List.fromList(codeUnits);
-  return unit8List;
 }

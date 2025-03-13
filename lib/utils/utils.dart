@@ -70,9 +70,6 @@ class MyUtils {
     }
   }
 
-  // void logFileWriteString(String text) async {
-  //   logFile.writeAsStringSync(text, mode: FileMode.append, flush: true);
-  // }
   Future<void> logFileWriteString(String text) async {
     await logFile.writeAsString(text, mode: FileMode.append, flush: true);
     // await logFile.writeAsString(text);
