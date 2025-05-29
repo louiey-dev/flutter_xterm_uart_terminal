@@ -22,7 +22,6 @@ This app is talking to xterm via UART, not plink and so on.</br>
   - ~~COM control screen~~
 - ~~Log file handler~~
   - Optimized with timer handler
-  - periodically check log buffer and save log file
 
 ## History
 
