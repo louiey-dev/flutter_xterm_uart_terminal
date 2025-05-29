@@ -62,6 +62,7 @@ class _ComScreenState extends State<ComScreen> {
             Expanded(
               flex: 0,
               child: DropdownButton(
+                hint: const Text("Select Command"),
                 value: _selectedValue,
                 items: _cmdList.map(
                   (value) {
@@ -89,7 +90,7 @@ class _ComScreenState extends State<ComScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 1),
+        const SizedBox(height: 5),
         Row(
           children: [
             // const SizedBox(width: 20),
@@ -229,8 +230,10 @@ class _ComScreenState extends State<ComScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(width: 20),
+            // louiey, 2025-05-29. COM port list
             DropdownButton(
-              menuMaxHeight: 0.5,
+              hint: const Text("Select COM port"),
+              // menuMaxHeight: 0.5,
               value: mSp,
               items: portList.map((item) {
                 return DropdownMenuItem(
@@ -239,11 +242,15 @@ class _ComScreenState extends State<ComScreen> {
               onChanged: (e) {
                 setState(() {
                   changedDropDownItem(e as SerialPort);
+                  utils.log("Selected port : ${e.name}");
                 });
               },
             ),
+
             const SizedBox(width: 20.0),
+            // louiey, 2025-05-29. Baudrate list
             DropdownButton(
+              hint: const Text("Select Baudrate"),
               value: menuBaudrate,
               items: baudRate.map((value) {
                 return DropdownMenuItem(

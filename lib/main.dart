@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           const SerialTerminal(),
           SizedBox(
-            height: 100,
+            height: 110,
             child: IndexedStack(
               index: _selectedIndex,
               children: const [

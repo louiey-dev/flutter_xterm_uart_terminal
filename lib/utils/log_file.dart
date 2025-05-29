@@ -3,6 +3,7 @@ import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:path/path.dart' as desktop_path;
 
 File? logFile;
 IOSink? logSink;
@@ -29,7 +30,18 @@ void logFileOpen(String logName) async {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyyMMdd_HHmmss').format(now);
 
+    // louiey, 2025-05-29. Get the user's desktop path
+    String? userProfile = Platform.environment['USERPROFILE'];
+    if (userProfile == null) {
+      throw Exception('USERPROFILE environment variable not found.');
+    }
+    String desktopPath = desktop_path.join(userProfile, 'Desktop');
+    /////////////////////////////////////////////////////////////////
+
     logFile = File('$path\\${formattedDate}_$logName');
+
+    // logFile = File('$desktopPath\\LOG\\${formattedDate}_$logName');
+    // louiey, 2025-05-29. if use desktop, it stopped working....??
 
     if (logFile != null) {
       logSink = logFile!.openWrite(mode: FileMode.append);
