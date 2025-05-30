@@ -93,10 +93,10 @@ void stopLogFlushTimer() {
 Future<void> flushLogBuffer() async {
   if (logBuffer.isNotEmpty) {
     // louiey, 2025-05-30. adding time stamp...still working
-    // List<String> str = logBuffer.toString().split('\r\n');
+    // List<String> str = logBuffer.toString().split('\n');
     // String time = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
     // for (int i = 0; i < str.length; i++) {
-    //   str[i] += '[$time] ';
+    //   str[i] = '[$time] ${str[i]}';
     //   logSink?.write(str);
     // }
 

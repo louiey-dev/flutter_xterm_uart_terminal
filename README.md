@@ -25,7 +25,6 @@ This app is talking to xterm via UART, not plink and so on.</br>
   - put time stamp at front of each line in log file
 - Log start/stop button add
 - screen overflow error fix in case of Settings screen smaller than screen height
-- Log file is not close when com port closed
 
 ## History
 
@@ -46,4 +45,6 @@ This app is talking to xterm via UART, not plink and so on.</br>
 - 2025.05.30
   - copy and paste on terminal window
     - added onSecondaryTapDown with terminalController
+  - Log file is not close when com port closed
+    - added close 
   - 

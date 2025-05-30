@@ -7,6 +7,8 @@ import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart'
 import 'package:flutter_xterm_uart_terminal/utils/log_file.dart';
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 
+import 'package:gif/gif.dart';
+
 List<SerialPort> portList = [];
 SerialPort? mSp;
 
@@ -33,7 +35,7 @@ class ComScreen extends StatefulWidget {
   State<ComScreen> createState() => _ComScreenState();
 }
 
-class _ComScreenState extends State<ComScreen> {
+class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
   int menuBaudrate = 115200;
   String openButtonText = 'N/A';
   List<int> baudRate = [3800, 9600, 115200, 1500000];
@@ -44,6 +46,15 @@ class _ComScreenState extends State<ComScreen> {
   final _cmdList = ['pwd', 'ls -al', 'tail -F /var/log/legacy-log'];
   var _selectedValue = 'pwd';
   // final _logFileList = ['DateTime', ''];
+
+  String logStartStopText = 'Log Start';
+  bool _isPlaying = false;
+  late GifController _gifController;
+  @override
+  void initState() {
+    _gifController = GifController(vsync: this);
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -73,6 +84,7 @@ class _ComScreenState extends State<ComScreen> {
             ? 'Close'
             : 'Open';
 
+    // logStartStopText = _isPlaying ? 'Log Stop' : 'Log Start';
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -116,8 +128,8 @@ class _ComScreenState extends State<ComScreen> {
               // const SizedBox(width: 20),
               // const Text("Log file input = "),
               const SizedBox(width: 20),
-              Expanded(
-                flex: 1,
+              SizedBox(
+                width: 300,
                 child: TextField(
                   controller: logFileNameController,
                   decoration: const InputDecoration(
@@ -128,7 +140,34 @@ class _ComScreenState extends State<ComScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 600)
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  if (_isPlaying) {
+                    _gifController.stop();
+                    _isPlaying = false;
+                    utils.log("GIF stopped, $logStartStopText");
+                    logStartStopText = "Log Start";
+                  } else {
+                    _gifController.repeat();
+                    _isPlaying = true;
+                    utils.log("GIF started, $logStartStopText");
+                    logStartStopText = "Log Stop";
+                  }
+
+                  setState(() {});
+                },
+                child: Text(logStartStopText),
+              ),
+              const SizedBox(width: 10),
+              Gif(
+                width: 50.0,
+                height: 50.0,
+                image: const AssetImage('assets/images/duck.gif'),
+                controller: _gifController,
+                autostart: Autostart.no,
+              ),
+              // const SizedBox(width: 10),
             ],
           ),
         ],
