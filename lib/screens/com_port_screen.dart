@@ -46,6 +46,26 @@ class _ComScreenState extends State<ComScreen> {
   // final _logFileList = ['DateTime', ''];
 
   @override
+  void dispose() {
+    // Close the SerialPortReader stream if it exists
+    reader?.close();
+    utils.log("Serial reader closed");
+
+    // Close the SerialPort if it is open
+    if (mSp != null && mSp!.isOpen) {
+      mSp!.close();
+    }
+    // Optionally set mSp to null if you want to fully release the reference
+    mSp = null;
+    utils.log("Serial port closed");
+
+    stopLogFlushTimer();
+    utils.log("Logging file closed");
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     openButtonText = mSp == null
         ? 'N/A'
@@ -53,65 +73,66 @@ class _ComScreenState extends State<ComScreen> {
             ? 'Close'
             : 'Open';
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            _comPort(),
-            const SizedBox(width: 20),
-            Expanded(
-              flex: 0,
-              child: DropdownButton(
-                hint: const Text("Select Command"),
-                value: _selectedValue,
-                items: _cmdList.map(
-                  (value) {
-                    return DropdownMenuItem(
-                      value: value,
-                      child: Text(value),
-                    );
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              _comPort(),
+              const SizedBox(width: 20),
+              Flexible(
+                child: DropdownButton(
+                  // hint: const Text("Select Command"),
+                  value: _selectedValue,
+                  items: _cmdList.map(
+                    (value) {
+                      return DropdownMenuItem(
+                        value: value,
+                        child: Text(value),
+                      );
+                    },
+                  ).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedValue = value!;
+                    });
                   },
-                ).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedValue = value!;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: 20),
-            Flexible(
-              child: ElevatedButton(
-                onPressed: () {
-                  serialSend("$_selectedValue\n");
-                },
-                child: const Text("Send"),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Row(
-          children: [
-            // const SizedBox(width: 20),
-            // const Text("Log file input = "),
-            const SizedBox(width: 20),
-            Expanded(
-              flex: 1,
-              child: TextField(
-                controller: logFileNameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'input log file name',
-                  labelText: 'DateTime',
-                  prefixIcon: Icon(Icons.save_rounded),
                 ),
               ),
-            ),
-            const SizedBox(width: 600)
-          ],
-        ),
-      ],
+              const SizedBox(width: 20),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    serialSend("$_selectedValue\n");
+                  },
+                  child: const Text("Send"),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Row(
+            children: [
+              // const SizedBox(width: 20),
+              // const Text("Log file input = "),
+              const SizedBox(width: 20),
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  controller: logFileNameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'input log file name',
+                    labelText: 'DateTime',
+                    prefixIcon: Icon(Icons.save_rounded),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 600)
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -169,11 +190,23 @@ class _ComScreenState extends State<ComScreen> {
     }
   }
 
+  _comClose() {
+    if (mSp!.isOpen) {
+      mSp!.close();
+      utils.log('${mSp!.name} closed!');
+      reader!.close();
+      // mSp!.dispose();
+    } else {
+      utils.e("COM port is not open, cannot close it.");
+    }
+  }
+
   _comOpen() {
     if (mSp!.isOpen) {
       mSp!.close();
       utils.log('${mSp!.name} closed!');
       reader!.close();
+      // mSp!.dispose();
     } else {
       if (mSp!.open(mode: SerialPortMode.readWrite)) {
         SerialPortConfig config = mSp!.config;
@@ -207,8 +240,8 @@ class _ComScreenState extends State<ComScreen> {
       } else {
         utils.e("COM port open error\n");
         // if (mSp!.isOpen) {
-        //   mSp!.close();
         // }
+        mSp!.close();
         // mSp!.dispose();
       }
     }
@@ -273,15 +306,20 @@ class _ComScreenState extends State<ComScreen> {
             ),
             const SizedBox(width: 20.0),
             ElevatedButton(
+              // louiey, 2025-05-30. Com Open/Close
               onPressed: () {
                 if (mSp == null) {
+                  utils.e("port is null");
                   return;
                 }
-                _comOpen();
 
-                if (!mSp!.isOpen) {
-                  _comConfig();
-                } else {}
+                if (mSp!.isOpen) {
+                  _comClose();
+                  logFileClose();
+                  utils.log("Logging file closed");
+                } else {
+                  _comOpen();
+                }
 
                 setState(() {});
               },

@@ -18,10 +18,14 @@ This app is talking to xterm via UART, not plink and so on.</br>
 
 ## TODOs
 
-- Separate screens
-  - ~~COM control screen~~
-- ~~Log file handler~~
-  - Optimized with timer handler
+- COM open error if exited from app without com port close
+  - couldn't open com in this case and should reset com port (disconnect com port and re-insert)
+- apply riverpod for state management
+- add time stamp at log file
+  - put time stamp at front of each line in log file
+- Log start/stop button add
+- screen overflow error fix in case of Settings screen smaller than screen height
+- Log file is not close when com port closed
 
 ## History
 

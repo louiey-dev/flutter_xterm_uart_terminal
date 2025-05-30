@@ -58,6 +58,15 @@ void logFileOpen(String logName) async {
   }
 }
 
+Future<void> logFileClose() async {
+  stopLogFlushTimer();
+
+  await logSink!.flush();
+  await logSink!.close();
+
+  utils.log("log file closed");
+}
+
 // Start a timer to periodically flush the buffer
 void startLogFlushTimer() {
   utils.log("Log flushLogTimer started : $flushLogInterval");
@@ -75,11 +84,22 @@ void stopLogFlushTimer() {
   } else {
     utils.log('Log flushLogTimer is not active!');
   }
+  logBuffer.clear();
+  // logSink?.flush();
+  // logSink?.close(); // Close the sink to release resources
 }
 
 // Flush the buffer to disk asynchronously
 Future<void> flushLogBuffer() async {
   if (logBuffer.isNotEmpty) {
+    // louiey, 2025-05-30. adding time stamp...still working
+    // List<String> str = logBuffer.toString().split('\r\n');
+    // String time = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    // for (int i = 0; i < str.length; i++) {
+    //   str[i] += '[$time] ';
+    //   logSink?.write(str);
+    // }
+
     logSink?.write(logBuffer.toString());
     logBuffer.clear(); // Clear the buffer after writing
     utils.log("log saved");
