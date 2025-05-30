@@ -39,3 +39,7 @@ This app is talking to xterm via UART, not plink and so on.</br>
   - Log feature added
   - Use timer to log to file and saved resources
   - Log file handler added
+- 2025.05.30
+  - copy and paste on terminal window
+    - added onSecondaryTapDown with terminalController
+  - 

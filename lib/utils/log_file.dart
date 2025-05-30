@@ -35,7 +35,8 @@ void logFileOpen(String logName) async {
     if (userProfile == null) {
       throw Exception('USERPROFILE environment variable not found.');
     }
-    String desktopPath = desktop_path.join(userProfile, 'Desktop');
+    String desktopPath = desktop_path.join(userProfile, 'Desktop') + "\\LOG";
+    utils.log(desktopPath.toString());
     /////////////////////////////////////////////////////////////////
 
     logFile = File('$path\\${formattedDate}_$logName');
