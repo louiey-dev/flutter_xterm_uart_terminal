@@ -23,7 +23,6 @@ This app is talking to xterm via UART, not plink and so on.</br>
 - apply riverpod for state management
 - add time stamp at log file
   - put time stamp at front of each line in log file
-- Log start/stop button add
 - screen overflow error fix in case of Settings screen smaller than screen height
 
 ## History
@@ -47,4 +46,9 @@ This app is talking to xterm via UART, not plink and so on.</br>
     - added onSecondaryTapDown with terminalController
   - Log file is not close when com port closed
     - added close 
-  - 
+- 2025.06.02
+  - Log start/stop button added
+    - Once you press "Log Start" button, it creates log file with given name and duck is walking
+    - matrix_rain.gif added but not so good. Duck is better
+    - if log file name text input has a test, file name is used as you input, otherwise it's name will be xterm_datetime.log
+  - LogFileControl class added and removed old codes

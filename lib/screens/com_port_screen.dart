@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:flutter_xterm_uart_terminal/screens/serial_terminal_screen.dart';
-import 'package:flutter_xterm_uart_terminal/utils/log_file.dart';
+import 'package:flutter_xterm_uart_terminal/utils/log_file_control.dart';
 import 'package:flutter_xterm_uart_terminal/utils/utils.dart';
 
 import 'package:gif/gif.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 List<SerialPort> portList = [];
 SerialPort? mSp;
@@ -39,7 +41,6 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
   int menuBaudrate = 115200;
   String openButtonText = 'N/A';
   List<int> baudRate = [3800, 9600, 115200, 1500000];
-  final _logFileName = "xterm.log";
 
   SerialPortReader? reader;
 
@@ -58,6 +59,7 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    utils.log("disposed");
     // Close the SerialPortReader stream if it exists
     reader?.close();
     utils.log("Serial reader closed");
@@ -69,9 +71,6 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
     // Optionally set mSp to null if you want to fully release the reference
     mSp = null;
     utils.log("Serial port closed");
-
-    stopLogFlushTimer();
-    utils.log("Logging file closed");
 
     super.dispose();
   }
@@ -135,7 +134,7 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'input log file name',
-                    labelText: 'DateTime',
+                    labelText: 'Log file name',
                     prefixIcon: Icon(Icons.save_rounded),
                   ),
                 ),
@@ -148,10 +147,12 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
                     _isPlaying = false;
                     utils.log("GIF stopped, $logStartStopText");
                     logStartStopText = "Log Start";
+                    logFileClose(); // Close the log file
                   } else {
                     _gifController.repeat();
                     _isPlaying = true;
                     utils.log("GIF started, $logStartStopText");
+                    logFileOpen();
                     logStartStopText = "Log Stop";
                   }
 
@@ -164,6 +165,7 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
                 width: 50.0,
                 height: 50.0,
                 image: const AssetImage('assets/images/duck.gif'),
+                // image: const AssetImage('assets/images/matrix_rain.gif'),
                 controller: _gifController,
                 autostart: Autostart.no,
               ),
@@ -248,28 +250,14 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
       // mSp!.dispose();
     } else {
       if (mSp!.open(mode: SerialPortMode.readWrite)) {
-        SerialPortConfig config = mSp!.config;
-        // https://www.sigrok.org/api/libserialport/0.1.1/a00007.html#gab14927cf0efee73b59d04a572b688fa0
-        // https://www.sigrok.org/api/libserialport/0.1.1/a00004_source.html
-        // config.baudRate = 115200;
-        config.baudRate = menuBaudrate;
-        config.parity = 0;
-        config.bits = 8;
-        config.cts = 0;
-        config.rts = 0;
-        config.stopBits = 1;
-        config.xonXoff = 0;
-        mSp!.config = config;
+        _comConfig();
 
-        utils.log("baudrate : $menuBaudrate");
         if (mSp!.isOpen) {
           utils.log('${mSp!.name} opened!');
         } else {
           utils.e("mSP open error\n");
           return;
         }
-
-        logFileOpen(_logFileName);
 
         terminal.onOutput = (data) {
           mSp!.write(Uint8List.fromList(data.codeUnits));
@@ -278,21 +266,24 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
         _readSerialData();
       } else {
         utils.e("COM port open error\n");
-        // if (mSp!.isOpen) {
-        // }
         mSp!.close();
-        // mSp!.dispose();
       }
     }
   }
 
   void _readSerialData() {
-    reader = SerialPortReader(mSp!, timeout: 1000);
-    reader!.stream.listen((data) {
-      String str = String.fromCharCodes(data);
-      terminal.write(str);
-      logBuffer.write(str);
-    });
+    try {
+      reader = SerialPortReader(mSp!, timeout: 1000);
+      reader!.stream.listen((data) {
+        String str = String.fromCharCodes(data);
+        terminal.write(str);
+        if (lfc != null) {
+          lfc?.update(str);
+        }
+      });
+    } catch (ex) {
+      utils.e("Error reading serial data: $ex");
+    }
   }
 
   _comPort() {
@@ -354,7 +345,15 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
 
                 if (mSp!.isOpen) {
                   _comClose();
-                  logFileClose();
+
+                  // louiey, 2025-06-02. check whether logging is enabled
+                  if (lfc != null) {
+                    bool? flag = lfc?.isLogging;
+                    if (flag == true) {
+                      lfc?.close();
+                    }
+                  }
+
                   utils.log("Logging file closed");
                 } else {
                   _comOpen();
