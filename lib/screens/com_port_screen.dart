@@ -92,14 +92,18 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
               _comPort(),
               const SizedBox(width: 20),
               Flexible(
+                flex: 1,
                 child: DropdownButton(
-                  // hint: const Text("Select Command"),
+                  isExpanded: true,
                   value: _selectedValue,
                   items: _cmdList.map(
                     (value) {
                       return DropdownMenuItem(
                         value: value,
-                        child: Text(value),
+                        child: Text(
+                          value,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     },
                   ).toList(),
@@ -112,6 +116,7 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(width: 20),
               Flexible(
+                flex: 1,
                 child: ElevatedButton(
                   onPressed: () {
                     serialSend("$_selectedValue\n");
@@ -313,6 +318,7 @@ class _ComScreenState extends State<ComScreen> with TickerProviderStateMixin {
             const SizedBox(width: 20.0),
             // louiey, 2025-05-29. Baudrate list
             DropdownButton(
+              // isExpanded: true,
               hint: const Text("Select Baudrate"),
               value: menuBaudrate,
               items: baudRate.map((value) {
