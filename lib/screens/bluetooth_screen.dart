@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_xterm_uart_terminal/config.dart';
+
+final TextEditingController collectLogController = TextEditingController();
 
 class BluetoothScreen extends StatefulWidget {
   const BluetoothScreen({super.key});
@@ -11,9 +12,6 @@ class BluetoothScreen extends StatefulWidget {
 class _BluetoothScreenState extends State<BluetoothScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      heightFactor: navigation_screen_height,
-      child: Text("Bluetooth Screen"),
-    );
+    return const Center(child: Text("BT Screen"));
   }
 }

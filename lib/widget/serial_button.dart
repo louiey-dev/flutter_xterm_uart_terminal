@@ -77,3 +77,24 @@ Widget getProfileId(String btnName) {
 
   return serialBtn(btnName, cmd);
 }
+
+Widget serialBtnToolTip(
+    int duration, String message, String btnName, String cmdStr) {
+  return Tooltip(
+    waitDuration: Duration(seconds: duration),
+    message: message,
+    child: ElevatedButton(
+      onPressed: () {
+        serialSend("$cmdStr\n");
+      },
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        elevation: 1.0, // louiey. Shadow
+        // backgroundColor: Colors.amber,
+      ),
+      child: Text(btnName),
+    ),
+  );
+}

@@ -52,3 +52,5 @@ This app is talking to xterm via UART, not plink and so on.</br>
     - matrix_rain.gif added but not so good. Duck is better
     - if log file name text input has a test, file name is used as you input, otherwise it's name will be xterm_datetime.log
   - LogFileControl class added and removed old codes
+- 2025.06.12
+  - BT buttons added
